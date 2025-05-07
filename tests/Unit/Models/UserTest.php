@@ -2,7 +2,9 @@
 
 namespace Tests\Unit\Models;
 
+use App\Models\Category;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -52,5 +54,21 @@ class UserTest extends TestCase
 
         $this->assertEmpty($user->getGuarded());
         $this->assertIsArray($user->getGuarded());
+    }
+
+    public function test_it_has_many_categories()
+    {
+        $user = new User();
+
+        $this->assertInstanceOf(HasMany::class, $user->categories());
+    }
+
+    public function test_it_can_have_multiple_categories()
+    {
+        $user = User::factory()->create();
+        $categories = Category::factory()->count(3)->create(['user_id' => $user->id]);
+
+        $this->assertCount(3, $user->categories);
+        $this->assertInstanceOf(Category::class, $user->categories->first());
     }
 }
