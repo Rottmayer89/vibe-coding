@@ -1,0 +1,97 @@
+You are an expert in PHP,laravel,MySql,HTML,Css,Javascript,Tailwind,Alpine js,Composer,Blade.
+Please implement only the command or prompt I give you and Dont do any further implementation.
+Dont write comment or explanation.
+
+1. Coding Standards
+   •	Use PHP v8.2 features.
+
+
+2. Project Structure & Architecture
+   •	Delete .gitkeep when adding a file.
+   •	Stick to existing structure—no new folders.
+   •	Avoid DB::; use Model:: only.
+
+
+2.1 Directory Conventions
+
+app/Http/Controllers
+•	To apply policies inside methods use Gate facade , Example:
+```PHP
+
+      Gate::authorize('update', $model_object)
+
+```
+
+app/Http/Requests
+•	Use FormRequest for validation.
+•	Name with Store, Update, Delete.
+•	If UpdateRequest is equal to StoreRequest, you can use inheritance
+•	In rule methods, define rules as array
+•	Use prepareForValidation method to prepare data before validation such as sanitize the data
+
+app/Actions
+•	Use Actions pattern and naming verbs.
+•	Example:
+
+```php
+public function store(StoreCostRequest $request, StoreCostAction $action)
+{
+    $user = $request->user();
+
+    $action->handle($user, $request->validated());
+}
+```
+
+app/Models
+•	Avoid fillable.
+•	Use guarded .
+
+app/Policies
+•	Remove any method that returns true .
+
+
+
+database/migrations
+•	Dont use defaults
+
+3. Testing
+   •	Use PHP Unit for all tests.
+   •	Don’t remove tests without approval.
+   •	All code must be tested.
+   •	Generate a {Model}Factory with each model.
+    •	Use snake_case for method names inside tests
+    •	Use small and obvious names for methds starting with test_it_...
+    •	Dont implement test for factory itself
+
+3.1 Test Directory Structure
+•	Console: tests/Feature/Console
+•	Controllers: tests/Feature/Http
+•	Actions: tests/Unit/Actions : Dont implement policy tests inside Actions
+•	Models: tests/Unit/Models
+•	Jobs: tests/Unit/Jobs
+
+4. Styling & UI
+   •	Use Tailwind CSS for styling.
+   •	Use Alpine js for interactions.
+   •	Keep UI minimal.
+   •	Consider laravel.com as UI sample  .
+   •	Use html svg tag for all icons and make blade component for each icon and use it  .
+   •	Never use inline styles or js, always write them in seperae css and js files  .
+
+
+5. Task Completion Requirements
+   •	Recompile assets after frontend changes.
+   •	Follow all rules before marking tasks complete.
+
+6. Formatting:
+ •	Use snake_case for variable names.
+ •	Use camelCase for function & method names.
+ •	Use PascalCase for Class & Enum & Trait names.
+ •	Use snake_case for method names inside tests
+
+
+7. Commenting:
+ •	Dont put comment in code except for dividing sections in blade files.
+ •	Dont put comment inside tests.
+ •	Dont put comment inside functions & methods.
+ 
