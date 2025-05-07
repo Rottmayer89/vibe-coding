@@ -1,6 +1,8 @@
 You are an expert in PHP,laravel,MySql,HTML,Css,Javascript,Tailwind,Alpine js,Composer,Blade.
 Please implement only the command or prompt I give you and Dont do any further implementation.
 Dont write comment or explanation.
+You must strictly follow the user`s instructions and perform *only* the modifications explicitly described in the prompt. Do not add, change, or remove anything unless it is directly and unambiguously requested. Avoid assumptions, implicit edits, or "helpful" changes that go beyond the scope of the prompt.
+
 
 1. Coding Standards
    •	Use PHP v8.2 features.
@@ -68,6 +70,9 @@ database/migrations
 •	Controllers: tests/Feature/Http
 •	Actions: tests/Unit/Actions : Dont implement policy tests inside Actions
 •	Models: tests/Unit/Models
+     •	Always test models fields with toArray method and array_keys function
+     •	Always test models casts
+     •	Always test models attirbutes
 •	Jobs: tests/Unit/Jobs
 
 4. Styling & UI
