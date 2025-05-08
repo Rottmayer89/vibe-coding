@@ -30,8 +30,10 @@ app/Http/Requests
 •	If UpdateRequest is equal to StoreRequest, you can use inheritance
 •	In rule methods, define rules as array
 •	Use prepareForValidation method to prepare data before validation such as sanitize the data
+•	Put actions test files inside directory asoociated with model name Example: App\Https\Requests\Category
 
 app/Actions
+•	Put actions file inside directory asoociated with model name Example: App\Actions\Category
 •	Use Actions pattern and naming verbs.
 •	Example:
 
@@ -68,7 +70,9 @@ database/migrations
 3.1 Test Directory Structure
 •	Console: tests/Feature/Console
 •	Controllers: tests/Feature/Http
-•	Actions: tests/Unit/Actions : Dont implement policy tests inside Actions
+•	Actions: tests/Unit/Actions : 
+      •	Dont implement policy tests inside Actions
+      •	Put actions test files inside directory asoociated with model name Example: tests/Unit/Actions/Category
 •	Models: tests/Unit/Models
      •	Always test models fields with toArray method and array_keys function
      •	Always test models casts
