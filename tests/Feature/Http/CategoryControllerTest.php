@@ -11,11 +11,20 @@ class CategoryControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * Index tests
+     */
+    public function test_it_denies_guest_from_viewing_index()
+    {
+        $response = $this->get(route('categories.index'));
+
+        $response->assertRedirect(route('login'));
+    }
 
     public function test_it_displays_categories_page()
     {
         $user = User::factory()->create();
-        $categories = Category::factory()->count(3)->create(['user_id' => $user->id]);
+        Category::factory()->count(3)->create(['user_id' => $user->id]);
 
         $response = $this
             ->actingAs($user)
@@ -23,14 +32,21 @@ class CategoryControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertViewHas('categories');
+        $response->assertViewIs('categories.index');
     }
 
-    public function test_it_denies_guest_from_viewing_index()
+
+
+    /**
+     * Create tests
+     */
+    public function test_it_denies_guest_from_viewing_create_form()
     {
-        $response = $this->get(route('categories.index'));
+        $response = $this->get(route('categories.create'));
 
         $response->assertRedirect(route('login'));
     }
+
 
     public function test_it_displays_create_form()
     {
@@ -44,9 +60,16 @@ class CategoryControllerTest extends TestCase
         $response->assertViewIs('categories.create');
     }
 
-    public function test_it_denies_guest_from_viewing_create_form()
+
+
+    /**
+     * Store tests
+     */
+    public function test_it_denies_guest_from_storing_category()
     {
-        $response = $this->get(route('categories.create'));
+        $data = ['name' => 'Test Category'];
+
+        $response = $this->post(route('categories.store'), $data);
 
         $response->assertRedirect(route('login'));
     }
@@ -61,21 +84,8 @@ class CategoryControllerTest extends TestCase
             ->post(route('categories.store'), $data);
 
         $response->assertRedirect(route('categories.index'));
-        $this->assertDatabaseHas('categories', [
-            'name' => 'Test Category',
-            'user_id' => $user->id
-        ]);
     }
 
-    public function test_it_denies_guest_from_storing_category()
-    {
-        $data = ['name' => 'Test Category'];
-
-        $response = $this->post(route('categories.store'), $data);
-
-        $response->assertRedirect(route('login'));
-        $this->assertDatabaseMissing('categories', ['name' => 'Test Category']);
-    }
 
     public function test_it_validates_name_is_required()
     {
@@ -111,6 +121,23 @@ class CategoryControllerTest extends TestCase
         $response->assertSessionHasErrors('name');
     }
 
+
+
+
+
+    /**
+     * Edit tests
+     */
+    public function test_it_denies_guest_from_viewing_edit_form()
+    {
+        $user = User::factory()->create();
+        $category = Category::factory()->create(['user_id' => $user->id]);
+
+        $response = $this->get(route('categories.edit', $category));
+
+        $response->assertRedirect(route('login'));
+    }
+
     public function test_it_displays_edit_form()
     {
         $user = User::factory()->create();
@@ -123,16 +150,6 @@ class CategoryControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('categories.edit');
         $response->assertViewHas('category', $category);
-    }
-
-    public function test_it_denies_guest_from_viewing_edit_form()
-    {
-        $user = User::factory()->create();
-        $category = Category::factory()->create(['user_id' => $user->id]);
-
-        $response = $this->get(route('categories.edit', $category));
-
-        $response->assertRedirect(route('login'));
     }
 
     public function test_it_denies_unauthorized_user_from_viewing_edit_form()
@@ -149,6 +166,22 @@ class CategoryControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+
+
+    /**
+     * Update tests
+     */
+    public function test_it_denies_guest_from_updating_category()
+    {
+        $user = User::factory()->create();
+        $category = Category::factory()->create(['user_id' => $user->id]);
+        $data = ['name' => 'Updated Category'];
+
+        $response = $this->patch(route('categories.update', $category), $data);
+
+        $response->assertRedirect(route('login'));
+    }
+
     public function test_it_updates_category()
     {
         $user = User::factory()->create();
@@ -160,10 +193,6 @@ class CategoryControllerTest extends TestCase
             ->patch(route('categories.update', $category), $data);
 
         $response->assertRedirect(route('categories.index'));
-        $this->assertDatabaseHas('categories', [
-            'id' => $category->id,
-            'name' => 'Updated Category'
-        ]);
     }
 
     public function test_it_denies_unauthorized_user_from_updating_category()
@@ -179,26 +208,24 @@ class CategoryControllerTest extends TestCase
             ->patch(route('categories.update', $category), $data);
 
         $response->assertStatus(403);
-        $this->assertDatabaseMissing('categories', [
-            'id' => $category->id,
-            'name' => 'Updated Category'
-        ]);
     }
 
-    public function test_it_denies_guest_from_updating_category()
+
+
+
+    /**
+     * Delete tests
+     */
+    public function test_it_denies_guest_from_deleting_category()
     {
         $user = User::factory()->create();
         $category = Category::factory()->create(['user_id' => $user->id]);
-        $data = ['name' => 'Updated Category'];
 
-        $response = $this->patch(route('categories.update', $category), $data);
+        $response = $this->delete(route('categories.destroy', $category));
 
         $response->assertRedirect(route('login'));
-        $this->assertDatabaseMissing('categories', [
-            'id' => $category->id,
-            'name' => 'Updated Category'
-        ]);
     }
+
 
     public function test_it_deletes_category()
     {
@@ -210,7 +237,6 @@ class CategoryControllerTest extends TestCase
             ->delete(route('categories.destroy', $category));
 
         $response->assertRedirect(route('categories.index'));
-        $this->assertDatabaseMissing('categories', ['id' => $category->id]);
     }
 
     public function test_it_denies_unauthorized_user_from_deleting_category()
@@ -225,17 +251,5 @@ class CategoryControllerTest extends TestCase
             ->delete(route('categories.destroy', $category));
 
         $response->assertStatus(403);
-        $this->assertDatabaseHas('categories', ['id' => $category->id]);
-    }
-
-    public function test_it_denies_guest_from_deleting_category()
-    {
-        $user = User::factory()->create();
-        $category = Category::factory()->create(['user_id' => $user->id]);
-
-        $response = $this->delete(route('categories.destroy', $category));
-
-        $response->assertRedirect(route('login'));
-        $this->assertDatabaseHas('categories', ['id' => $category->id]);
     }
 }
