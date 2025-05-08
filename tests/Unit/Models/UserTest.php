@@ -3,6 +3,7 @@
 namespace Tests\Unit\Models;
 
 use App\Models\Category;
+use App\Models\Cost;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -70,5 +71,25 @@ class UserTest extends TestCase
 
         $this->assertCount(3, $user->categories);
         $this->assertInstanceOf(Category::class, $user->categories->first());
+    }
+
+    public function test_it_has_many_costs()
+    {
+        $user = new User();
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $user->costs());
+    }
+
+    public function test_it_can_have_multiple_costs()
+    {
+        $user = User::factory()->create();
+        $category = Category::factory()->create(['user_id' => $user->id]);
+        $costs = Cost::factory()->count(3)->create([
+            'user_id' => $user->id,
+            'category_id' => $category->id
+        ]);
+
+        $this->assertCount(3, $user->costs);
+        $this->assertInstanceOf(Cost::class, $user->costs->first());
     }
 }

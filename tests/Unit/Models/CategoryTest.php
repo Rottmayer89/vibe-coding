@@ -3,8 +3,10 @@
 namespace Tests\Unit\Models;
 
 use App\Models\Category;
+use App\Models\Cost;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -51,8 +53,28 @@ class CategoryTest extends TestCase
     {
         $user = User::factory()->create();
         $category = Category::factory()->create(['user_id' => $user->id]);
-
+        
         $this->assertInstanceOf(User::class, $category->user);
         $this->assertEquals($user->id, $category->user->id);
+    }
+    
+    public function test_it_has_many_costs()
+    {
+        $category = new Category();
+        
+        $this->assertInstanceOf(HasMany::class, $category->costs());
+    }
+    
+    public function test_it_can_have_multiple_costs()
+    {
+        $user = User::factory()->create();
+        $category = Category::factory()->create(['user_id' => $user->id]);
+        $costs = Cost::factory()->count(3)->create([
+            'user_id' => $user->id,
+            'category_id' => $category->id
+        ]);
+        
+        $this->assertCount(3, $category->costs);
+        $this->assertInstanceOf(Cost::class, $category->costs->first());
     }
 }
