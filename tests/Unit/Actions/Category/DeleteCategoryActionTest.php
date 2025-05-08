@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\Unit\Actions;
+namespace Tests\Unit\Actions\Category;
 
-use App\Actions\DeleteCategoryAction;
+use App\Actions\Category\DeleteCategoryAction;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

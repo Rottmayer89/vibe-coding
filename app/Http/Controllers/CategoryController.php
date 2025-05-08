@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\DeleteCategoryAction;
-use App\Actions\StoreCategoryAction;
-use App\Actions\UpdateCategoryAction;
+use App\Actions\Category\DeleteCategoryAction;
+use App\Actions\Category\StoreCategoryAction;
+use App\Actions\Category\UpdateCategoryAction;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;

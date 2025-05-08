@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions;
+namespace App\Actions\Category;
 
 use App\Models\Category;
 use App\Models\User;
