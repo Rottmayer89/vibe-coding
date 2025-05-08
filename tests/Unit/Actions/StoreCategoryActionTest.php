@@ -18,7 +18,7 @@ class StoreCategoryActionTest extends TestCase
         $data = ['name' => 'Test Category'];
         $action = new StoreCategoryAction();
 
-        $this->assertDatabaseHasCount('categories', 0);
+        $this->assertDatabaseCount('categories', 0);
 
         $action->handle($user, $data);
 

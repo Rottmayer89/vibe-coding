@@ -18,7 +18,7 @@ class DeleteCategoryActionTest extends TestCase
         $category = Category::factory()->create(['user_id' => $user->id]);
         $action = new DeleteCategoryAction();
 
-        $this->assertDatabaseHasCount('categories', 1);
+        $this->assertDatabaseCount('categories', 1);
 
         $action->handle($category);
 

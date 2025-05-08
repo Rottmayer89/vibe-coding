@@ -19,7 +19,7 @@ class UpdateCategoryActionTest extends TestCase
         $data = ['name' => 'Updated Category'];
         $action = new UpdateCategoryAction();
 
-        $this->assertDatabaseHasCount('categories', 1);
+        $this->assertDatabaseCount('categories', 1);
 
         $action->handle($category, $data);
 
