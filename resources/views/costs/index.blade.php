@@ -38,7 +38,12 @@
 
             <!-- Monthly Expenses Chart -->
             <x-charts.monthly-expense :data="$monthlyExpenses['data']" :labels="$monthlyExpenses['labels']" :year="$monthlyExpenses['year']" />
+            
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <!-- Category Filter -->
+                <div class="px-6 pt-6">
+                    <x-filters.category :categories="$categories" :selectedCategoryId="$categoryId" />                    
+                </div>
                 <div class="p-6 text-gray-900">
                     <!-- Costs Table -->
                     @if ($costs->isEmpty())

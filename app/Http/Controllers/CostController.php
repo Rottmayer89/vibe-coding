@@ -19,35 +19,55 @@ class CostController extends Controller
 {
     public function index(Request $request): View
     {
-        $costs = $request->user()->costs()->paginate(10);
         $userId = $request->user()->id;
+        $categoryId = $request->query('category_id');
         
-        // Get the current year's monthly expense data
-        $monthlyExpenses = $this->getMonthlyExpenses($userId);
+        // Get categories for the filter
+        $categories = $request->user()->categories;
         
-        // Get expense statistics
+        // Build the query
+        $costsQuery = $request->user()->costs();
+        
+        // Apply category filter if provided
+        if ($categoryId) {
+            $costsQuery->where('category_id', $categoryId);
+        }
+        
+        // Paginate the results
+        $costs = $costsQuery->paginate(10)->withQueryString();
+        
+        // Get the current year's monthly expense data (filtered by category if needed)
+        $monthlyExpenses = $this->getMonthlyExpenses($userId, $categoryId);
+        
+        // Get expense statistics (filtered by category if needed)
         $stats = [
-            'totalExpenses' => $this->getTotalExpenses($userId),
-            'yearlyExpenses' => $this->getCurrentYearExpenses($userId),
-            'monthlyExpenses' => $this->getCurrentMonthExpenses($userId)
+            'totalExpenses' => $this->getTotalExpenses($userId, $categoryId),
+            'yearlyExpenses' => $this->getCurrentYearExpenses($userId, $categoryId),
+            'monthlyExpenses' => $this->getCurrentMonthExpenses($userId, $categoryId)
         ];
         
-        return view('costs.index', compact('costs', 'monthlyExpenses', 'stats'));
+        return view('costs.index', compact('costs', 'monthlyExpenses', 'stats', 'categories', 'categoryId'));
     }
     
     /**
      * Get monthly expenses for the current year
      */
-    private function getMonthlyExpenses(int $userId): array
+    private function getMonthlyExpenses(int $userId, ?int $categoryId = null): array
     {
         $currentYear = Carbon::now()->year;
         $startDate = Carbon::createFromDate($currentYear, 1, 1)->startOfMonth();
         $endDate = Carbon::createFromDate($currentYear, 12, 31)->endOfMonth();
         
-        $monthlyData = Cost::select(DB::raw('MONTH(paid_at) as month'), DB::raw('SUM(amount) as total'))
+        $query = Cost::select(DB::raw('MONTH(paid_at) as month'), DB::raw('SUM(amount) as total'))
             ->where('user_id', $userId)
-            ->whereBetween('paid_at', [$startDate, $endDate])
-            ->groupBy(DB::raw('MONTH(paid_at)'))
+            ->whereBetween('paid_at', [$startDate, $endDate]);
+            
+        // Apply category filter if provided
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+        
+        $monthlyData = $query->groupBy(DB::raw('MONTH(paid_at)'))
             ->orderBy('month')
             ->get();
         
@@ -85,37 +105,53 @@ class CostController extends Controller
     /**
      * Get total expenses for a user
      */
-    private function getTotalExpenses(int $userId): int
+    private function getTotalExpenses(int $userId, ?int $categoryId = null): int
     {
-        return (int) Cost::where('user_id', $userId)->sum('amount');
+        $query = Cost::where('user_id', $userId);
+        
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+        
+        return (int) $query->sum('amount');
     }
     
     /**
      * Get current year expenses for a user
      */
-    private function getCurrentYearExpenses(int $userId): int
+    private function getCurrentYearExpenses(int $userId, ?int $categoryId = null): int
     {
         $currentYear = Carbon::now()->year;
         $startDate = Carbon::createFromDate($currentYear, 1, 1)->startOfDay();
         $endDate = Carbon::createFromDate($currentYear, 12, 31)->endOfDay();
         
-        return (int) Cost::where('user_id', $userId)
-            ->whereBetween('paid_at', [$startDate, $endDate])
-            ->sum('amount');
+        $query = Cost::where('user_id', $userId)
+            ->whereBetween('paid_at', [$startDate, $endDate]);
+            
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+        
+        return (int) $query->sum('amount');
     }
     
     /**
      * Get current month expenses for a user
      */
-    private function getCurrentMonthExpenses(int $userId): int
+    private function getCurrentMonthExpenses(int $userId, ?int $categoryId = null): int
     {
         $now = Carbon::now();
         $startOfMonth = $now->copy()->startOfMonth()->startOfDay();
         $endOfMonth = $now->copy()->endOfMonth()->endOfDay();
         
-        return (int) Cost::where('user_id', $userId)
-            ->whereBetween('paid_at', [$startOfMonth, $endOfMonth])
-            ->sum('amount');
+        $query = Cost::where('user_id', $userId)
+            ->whereBetween('paid_at', [$startOfMonth, $endOfMonth]);
+            
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+        
+        return (int) $query->sum('amount');
     }
 
 
