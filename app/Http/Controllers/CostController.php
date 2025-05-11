@@ -20,11 +20,19 @@ class CostController extends Controller
     public function index(Request $request): View
     {
         $costs = $request->user()->costs()->paginate(10);
+        $userId = $request->user()->id;
         
         // Get the current year's monthly expense data
-        $monthlyExpenses = $this->getMonthlyExpenses($request->user()->id);
+        $monthlyExpenses = $this->getMonthlyExpenses($userId);
         
-        return view('costs.index', compact('costs', 'monthlyExpenses'));
+        // Get expense statistics
+        $stats = [
+            'totalExpenses' => $this->getTotalExpenses($userId),
+            'yearlyExpenses' => $this->getCurrentYearExpenses($userId),
+            'monthlyExpenses' => $this->getCurrentMonthExpenses($userId)
+        ];
+        
+        return view('costs.index', compact('costs', 'monthlyExpenses', 'stats'));
     }
     
     /**
@@ -72,6 +80,42 @@ class CostController extends Controller
             'data' => array_values($data),
             'year' => $currentYear
         ];
+    }
+    
+    /**
+     * Get total expenses for a user
+     */
+    private function getTotalExpenses(int $userId): int
+    {
+        return (int) Cost::where('user_id', $userId)->sum('amount');
+    }
+    
+    /**
+     * Get current year expenses for a user
+     */
+    private function getCurrentYearExpenses(int $userId): int
+    {
+        $currentYear = Carbon::now()->year;
+        $startDate = Carbon::createFromDate($currentYear, 1, 1)->startOfDay();
+        $endDate = Carbon::createFromDate($currentYear, 12, 31)->endOfDay();
+        
+        return (int) Cost::where('user_id', $userId)
+            ->whereBetween('paid_at', [$startDate, $endDate])
+            ->sum('amount');
+    }
+    
+    /**
+     * Get current month expenses for a user
+     */
+    private function getCurrentMonthExpenses(int $userId): int
+    {
+        $now = Carbon::now();
+        $startOfMonth = $now->copy()->startOfMonth()->startOfDay();
+        $endOfMonth = $now->copy()->endOfMonth()->endOfDay();
+        
+        return (int) Cost::where('user_id', $userId)
+            ->whereBetween('paid_at', [$startOfMonth, $endOfMonth])
+            ->sum('amount');
     }
 
 
