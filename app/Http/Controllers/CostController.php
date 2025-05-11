@@ -17,7 +17,7 @@ class CostController extends Controller
 {
     public function index(Request $request): View
     {
-        $costs = $request->user()->costs;
+        $costs = $request->user()->costs()->paginate(10);
 
         return view('costs.index', compact('costs'));
     }

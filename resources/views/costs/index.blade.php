@@ -106,6 +106,11 @@
                                 @endforeach
                             </x-table.body>
                         </x-table.index>
+                        
+                        <!-- Pagination Links -->
+                        <div class="mt-6">
+                            {{ $costs->links() }}
+                        </div>
                     @endif
                 </div>
             </div>
