@@ -1,4 +1,4 @@
-Vibe Coding — Laravel Cost Manager
+<h1>Vibe Coding — Laravel Cost Manager</h1>
 Welcome to the official repository for the Vibe Coding Course.
 
 This project is a minimal cost management web application built using the Laravel framework. It has been developed as a part of the Vibe Coding course curriculum to demonstrate practical applications of modern PHP development practices with Ai.
